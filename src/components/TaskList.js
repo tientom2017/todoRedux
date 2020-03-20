@@ -1,5 +1,6 @@
 import React from 'react';
 import TaskItem from './TaskItem';
+import * as action from '../actions'
 import { connect } from 'react-redux';
 
 class TaskList extends React.Component {
@@ -23,23 +24,41 @@ class TaskList extends React.Component {
         this.props.onEdit(id)
     }
 
-    onChange = (event) => {
+    onGetFilterName = (event) => {
         var target = event.target;
         var name = target.name;
         var value = target.value;
-        this.props.onFilter(
-            name === 'filterName' ? value : this.state.filterName,
-            name === 'filterStatus' ? value : this.state.filterStatus
-        );
-        this.setState({
-            [name]: value
-        });
+        this.props.onGetFilterName(name === 'filterName' ? value : '')
     }
 
+    onGetFilterStatus = (event) => {
+        var target = event.target;
+        var name = target.name;
+        var value = target.value;
+        this.props.onGetFilterStatus(name === 'filterStatus' ? value : '')
+    }
+
+
     render() {
-        var { tasks } = this.props;
-        console.log(tasks);
-        var { filterName, filterStatus } = this.state
+        var { tasks, searchKeyword, filterName, filterStatus } = this.props;
+        if (searchKeyword) {
+            tasks = tasks.filter((task) => {
+                return task.name.toLowerCase().indexOf(searchKeyword.toLowerCase()) != -1;
+            })
+        }
+        if(filterName) {
+            tasks = tasks.filter((task) => {
+                return task.name.toLowerCase().indexOf(filterName.toLowerCase()) != -1;
+            })
+        }
+        tasks = tasks.filter((task) => {
+            if(filterStatus) {
+                if(parseInt(filterStatus, 10) === -1) return task;
+                if(parseInt(filterStatus, 10) === 0) return task.status === false
+                if(parseInt(filterStatus, 10) === 1) return task.status === true
+            }
+            return task;
+        })
         return (
             <table class="table table-bordered">
                 <thead>
@@ -62,7 +81,7 @@ class TaskList extends React.Component {
                                     id="txtSearch"
                                     name="filterName"
                                     value={filterName}
-                                    onChange={this.onChange}
+                                    onChange={this.onGetFilterName}
                                 />
                             </div>
                         </td>
@@ -72,7 +91,7 @@ class TaskList extends React.Component {
                                 aria-labelledby="dropdownMenu1"
                                 name="filterStatus"
                                 value={filterStatus}
-                                onChange={this.onChange}
+                                onChange={this.onGetFilterStatus}
                             >
                                 <option value={-1}>Tất cả</option>
                                 <option value={1}>Kích hoạt</option>
@@ -96,8 +115,22 @@ class TaskList extends React.Component {
 
 const mapStateToProps = (state) => {
     return {
-        tasks: state.tasks
+        tasks: state.tasks,
+        searchKeyword: state.search,
+        filterName: state.filterName,
+        filterStatus: state.filterStatus,
     }
 }
 
-export default connect(mapStateToProps, null)(TaskList);
+const mapDispatchToProps = (dispatch, ownProps) => {
+    return {
+        onGetFilterName: (filterName) => {
+            dispatch(action.filterName(filterName))
+        },
+        onGetFilterStatus: (filterStatus) => {
+            dispatch(action.filterStatus(filterStatus))
+        }
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(TaskList);

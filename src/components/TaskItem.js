@@ -1,4 +1,6 @@
 import React from 'react';
+import {connect} from 'react-redux';
+import * as action from '../actions';
 
 class TaskItem extends React.Component {
     constructor(props) {
@@ -10,11 +12,11 @@ class TaskItem extends React.Component {
     }
 
     onHandlePutId = (id) => {
-        this.props.ongetIdUpdateStatus(id)
+        this.props.onUpdateStt(id)
     }
 
     onDelete = (id) => {
-        this.props.onDelete(id)
+        this.props.ondeleteItem(id)
     }
 
     onEdit = (id) => {
@@ -39,4 +41,21 @@ class TaskItem extends React.Component {
     }
 }
 
-export default TaskItem;
+const mapStateToProps = (state) => {
+    return {
+
+    }
+}
+
+const mapDispatchToProps = (dispatch, props) => {
+    return {
+        onUpdateStt: (id) => {
+            dispatch(action.updateStt(id))
+        },
+        ondeleteItem: (id) => {
+            dispatch(action.deleteItem(id))
+        }
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(TaskItem);

@@ -1,1 +1,10 @@
 export const LIST_ALL = 'LIST_ALL';
+export const ADD_ITEM = 'ADD_ITEM';
+export const UPDATE_STT = 'UPDATE_STT';
+export const DELTETE_ITEM = 'DELTETE_ITEM';
+export const TOGGLE_FORM = 'TOGGLE_FORM';
+export const OPEN_FORM = 'OPEN_FORM';
+export const CLOSE_FORM = 'CLOSE_FORM';
+export const SEARCH = 'SEARCH';
+export const FILTER_NAME = 'FILTER_NAME';
+export const FILTER_STATUS = 'FILTER_STATUS';

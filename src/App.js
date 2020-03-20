@@ -3,15 +3,16 @@ import TaskForm from './components/TaskForm';
 import Control from './components/Control';
 import TaskList from './components/TaskList';
 // import demo from './trainning/demo'
-import _ from 'lodash'
-import './App.css'
+import _ from 'lodash';
+import './App.css';
+import * as action from './actions'
+import {connect} from 'react-redux';
 
 class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             tasks: [],
-            isDisplayForm: false,
             filter: {
                 name: '',
                 status: -1,
@@ -58,37 +59,12 @@ class App extends React.Component {
         localStorage.setItem('tasks', JSON.stringify(tasks));
     }
 
-    s4() {
-        return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-    }
-
-    generateId() {
-        return this.s4() + this.s4() + '-' + this.s4() + this.s4() + '-' + this.s4() + this.s4();
-    }
     onAddTask = () => {
         if (this.state.taskEditting !== null) {
             this.setState({
                 taskEditting: null
             });
-        } else this.onToggleForm();
-    }
-
-    onToggleForm = () => {
-        this.setState({
-            isDisplayForm: !this.state.isDisplayForm
-        })
-    }
-
-    onCloseForm = () => {
-        this.setState({
-            isDisplayForm: false
-        })
-    }
-
-    onOpenForm = () => {
-        this.setState({
-            isDisplayForm: true
-        })
+        } else this.props.onToggleForm();
     }
 
     onGetData = (data) => {
@@ -172,7 +148,8 @@ class App extends React.Component {
     }
 
     render() {
-        var { tasks, isDisplayForm, filter, keyword, sortBy, sortValue } = this.state;
+        var { tasks, filter, keyword, sortBy, sortValue } = this.state;
+        var {isDisplayForm} = this.props
         if (filter) {
             if (filter.name) {
                 tasks = tasks.filter((task) => {
@@ -213,7 +190,7 @@ class App extends React.Component {
                     <br />
                     <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                         {
-                            isDisplayForm === true ? <TaskForm task={this.state.taskEditting} onCloseForm={this.onCloseForm} onGetData={this.onGetData} /> : ''
+                            isDisplayForm === true ? <TaskForm task={this.state.taskEditting} onGetData={this.onGetData} /> : ''
                         }
                         <div className={isDisplayForm === true ? "col-xs-8 col-sm-8 col-md-8 col-lg-8" : "col-xs-12 col-sm-12 col-md-12 col-lg-12"}>
                             <div className="row">
@@ -233,4 +210,24 @@ class App extends React.Component {
     }
 }
 
-export default App;
+const mapStateToProps = (state) => {
+    return{
+        isDisplayForm: state.form
+    }
+}
+
+const mapDispatchToProps = (dispatch, props) => {
+    return{
+        onToggleForm: () => {
+            dispatch(action.toggleForm())
+        },
+        onOpenForm: () => {
+            dispatch(action.openForm())
+        },
+        onCloseForm: () => {
+            dispatch(action.closeForm())
+        },
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);

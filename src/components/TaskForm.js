@@ -1,4 +1,6 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import * as actions from '../actions/index'
 
 class TaskForm extends React.Component {
     constructor(props) {
@@ -7,7 +9,6 @@ class TaskForm extends React.Component {
             id: '',
             name: '',
             status: false,
-            task: null
         }
 
     }
@@ -21,6 +22,7 @@ class TaskForm extends React.Component {
             })
         }
     }
+
     componentWillReceiveProps(nextProps) {
         if (nextProps.task && nextProps.task != null) {
             this.setState({
@@ -33,10 +35,6 @@ class TaskForm extends React.Component {
             name: '',
             status: false
         })
-    }
-
-    onCloseForm = () => {
-        this.props.onCloseForm();
     }
 
     onChange = (event) => {
@@ -53,23 +51,23 @@ class TaskForm extends React.Component {
 
     onSubmit = (event) => {
         event.preventDefault();
-        this.props.onGetData(this.state);
+        // this.props.onGetData(this.state);
+        this.props.onAddTask(this.state);
         this.onClear();
-        this.onCloseForm();
     }
     onClear = () => {
         this.setState({
             name: '',
             status: false
         });
-        this.onCloseForm()
+        this.props.onCloseForm()
     }
 
     render() {
         return (
             <div className="col-xs-4 col-sm-4 col-md-4 col-lg-4">
                 <div class="panel panel-primary">
-                    <div class="panel-heading"> {this.props.task != null ? 'Sửa công việc' : 'Thêm công việc'} <i onClick={this.onCloseForm} className="fa fa-times-circle text-right float-right"></i></div>
+                    <div class="panel-heading"> {this.props.task != null ? 'Sửa công việc' : 'Thêm công việc'} <i onClick={this.props.onCloseForm} className="fa fa-times-circle text-right float-r"></i></div>
                     <div class="panel-body">
                         <form onSubmit={this.onSubmit}>
                             <div className="form-group">
@@ -104,4 +102,21 @@ class TaskForm extends React.Component {
     }
 }
 
-export default TaskForm;
+const mapStateToProps = state => {
+    return {
+
+    }
+}
+
+const mapDispatchToProps = (dispatch, props) => {
+    return {
+        onAddTask: (task) => {
+            dispatch(actions.addItem(task));
+        },
+        onCloseForm: () => {
+            dispatch(actions.closeForm())
+        },
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(TaskForm);
